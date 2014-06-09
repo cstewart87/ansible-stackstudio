@@ -1,0 +1,28 @@
+---
+  - hosts: all
+    sudo: yes
+    tasks:
+      # Fetch the code from github
+      - name: Ensure we got the App code
+        git:
+          repo=https://github.com/TranscendComputing/StackStudio.git
+          dest=/opt/stackstudio
+
+      - name: Ensure mongodb is started
+        shell: docker run -d -p 27017:27017 --name mongodb dockerfile/mongodb
+
+      - name: Ensure stackstudio backend.json
+        copy: src=config/backend.json dest=/opt/stackstudio/config/backend.json
+
+      - name: Ensure nginx sites dir
+        file: path=/etc/nginx/sites-enabled state=directory recurse=true
+
+      - name: Ensure nginx log dir
+        file: path=/var/log/nginx state=directory recurse=true
+
+      - name: Ensure stackstudio config
+        copy: src=config/default-site dest=/etc/nginx/sites-enabled/default
+
+      - name: Ensure nginx started
+        shell: "docker run -d -p 80:9001 -v /etc/nginx/sites-enabled:/etc/nginx/sites-enabled -v /var/log/nginx:/var/log/nginx -v /opt/stackstudio:/data dockerfile/nginx"
+

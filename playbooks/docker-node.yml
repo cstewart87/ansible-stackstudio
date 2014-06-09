@@ -1,0 +1,12 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+    - name: Docker pull nginx
+      shell: docker pull dockerfile/nginx
+
+    - name: Docker pull nodejs
+      shell: docker pull dockerfile/nodejs
+
+    - name: Docker pull mongodb
+      shell: docker pull dockerfile/mongodb

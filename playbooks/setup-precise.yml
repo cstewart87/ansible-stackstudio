@@ -1,0 +1,30 @@
+---
+- name: Setup Empty Precise Ubuntu for Docker Containers 
+  sudo: True
+  hosts: all
+  tasks:
+    - name: Update Server 
+      apt: update_cache=yes
+
+    - name: AUFS verification
+      apt: pkg=linux-image-generic-lts-raring state=latest
+      apt: pkg=linux-headers-generic-lts-raring state=latest      
+
+    - name: Add Docker repository 
+      shell: sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+
+    - name: Add Docker key
+      apt_key: url=https://get.docker.io/gpg state=present
+
+    - name: Update Server 
+      apt: update_cache=yes
+
+    - name: Install Docker
+      apt: pkg=lxc-docker state=latest update_cache=yes
+      notify:
+      - restart server
+
+  handlers:
+    - name: restart server
+      command: /sbin/reboot
+      sudo: yes
